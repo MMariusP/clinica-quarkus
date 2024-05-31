@@ -1,0 +1,28 @@
+databaseType = "PostgreSql"
+id = "395ef21c-cd40-48ac-b04e-816a08ab4757"
+name = "Clinica-Java-Code"
+
+[flyway]
+locations = [ "filesystem:migrations" ]
+mixed = true
+outOfOrder = true
+validateMigrationNaming = true
+
+  [flyway.check]
+  majorTolerance = 0
+
+[flywayDesktop]
+developmentEnvironment = "development"
+schemaModel = "schema-model"
+shadowEnvironment = "shadow"
+
+[redgateCompare]
+filterFile = "filter.rgf"
+
+[redgateCompare.postgresql.options.ignores]
+ignoreNewlinesInTextObjects = "off"
+
+[environments.clinicaJava]
+url = "jdbc:postgresql://localhost:5432/clinic"
+schemas = [ "clinic" ]
+displayName = "Quarkus-Clinica"
