@@ -6,4 +6,8 @@ import org.acme.data.User;
 
 @ApplicationScoped
 public class UserRepository implements PanacheRepository<User> {
+
+    public void deleteUserByUsername(String username) {
+        delete("username", username);
+    }
 }

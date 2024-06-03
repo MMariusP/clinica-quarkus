@@ -1,0 +1,12 @@
+<div id="editUserModal" class="modal">
+<div class="modal-content">
+    <span class="close" ng-click="closeModal()">&times;</span>
+    <h2>Edit User</h2>
+    <form ng-submit="submitEditForm()">
+        <input type="text" placeholder="Username" ng-model="form.username" disabled/>
+        <input type="text" placeholder="Password" ng-model="form.password"/>
+        <input type="text" placeholder="Email" ng-model="form.email"/>
+        <input type="submit" value="Save"/>
+    </form>
+</div>
+</div>

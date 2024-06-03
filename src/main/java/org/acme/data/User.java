@@ -46,7 +46,7 @@ public class User  {
     public Date createdAt = new Date();
 
 
-    @OneToMany(mappedBy = "userAppointmentDoctor", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(mappedBy = "userAppointmentDoctor", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = false)
     private List<Appointments> doctorsAppointments;
 
     @Override

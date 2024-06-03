@@ -1,4 +1,4 @@
-package org.acme;
+package org.acme.data.boundry;
 
 
 import jakarta.inject.Inject;
@@ -31,8 +31,6 @@ public class UserResource {
     }
 
 
-
-
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -48,8 +46,29 @@ public class UserResource {
     @Transactional
     public Response add(User user){
         LOG.info("Adding user: " + user.toString());
-
         userRepository.persist(user);
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("update")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public Response update(User user){
+        LOG.info("Adding user: " + user.toString());
+        userRepository.update(user);
+        return Response.ok().build();
+    }
+
+
+    @DELETE
+    @Path("delete/{username}")
+    @Transactional
+    public Response delete(@PathParam("username") String username){
+        LOG.info("Deleting user by username: " + username);
+
+        userRepository.deleteUserByUsername(username);
         return Response.ok().build();
     }
 }

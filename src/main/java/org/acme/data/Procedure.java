@@ -12,6 +12,6 @@ public class Procedure {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer id;
 
-    @OneToMany(mappedBy = "procedure", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(mappedBy = "procedure", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = false)
     private List<Appointments> appointmentsForProcedure;
 }
