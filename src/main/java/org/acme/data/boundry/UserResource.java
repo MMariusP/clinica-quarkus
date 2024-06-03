@@ -57,7 +57,7 @@ public class UserResource {
     @Transactional
     public Response update(User user){
         LOG.info("Adding user: " + user.toString());
-        userRepository.update(user);
+       // userRepository.update(user);
         return Response.ok().build();
     }
 
