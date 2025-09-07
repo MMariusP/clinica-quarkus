@@ -14,6 +14,7 @@ import org.acme.data.Procedure;
 import org.acme.data.User;
 import org.acme.data.boundry.dto.AppointmentDto;
 
+import org.acme.data.boundry.dto.Mappers;
 import org.acme.data.repoistory.AppointmentRepository;
 import org.acme.data.repoistory.ProcedureRepository;
 import org.acme.data.repoistory.UserRepository;
@@ -23,6 +24,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+
+import org.acme.data.util.ClinicUtil;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
@@ -38,9 +41,6 @@ public class AppointmentService {
     private static final Logger LOG = Logger.getLogger(AppointmentService.class);
 
 
-    private static final ZoneId BUCURESTI = ZoneId.of("Europe/Bucharest");
-    private static final DateTimeFormatter IO_FMT =
-            DateTimeFormatter.ofPattern("MM.dd.yyyy HH:mm", Locale.ROOT);
 
     @Transactional
     public AppointmentDto create(@Valid AppointmentDto dto) {
@@ -59,8 +59,8 @@ public class AppointmentService {
         }
         LOG.info("Procedure: " + procedure.toString());
 
-        OffsetDateTime startAt = parseBucharest(dto.getStartAt());
-        OffsetDateTime endAt= parseBucharest(dto.getEndAt());
+        OffsetDateTime startAt = ClinicUtil.parseBucharest(dto.getStartAt());
+        OffsetDateTime endAt= ClinicUtil.parseBucharest(dto.getEndAt());
 
         Appointment entity = new Appointment();
         entity.setDoctor(doctor);
@@ -73,7 +73,7 @@ public class AppointmentService {
 
         appointmentRepo.persist(entity); // no explicit EntityManager
 
-        return toDto(entity);
+        return Mappers.mapToDto(entity);
     }
 
     // -------------------------
@@ -91,7 +91,7 @@ public class AppointmentService {
         if (appt == null) {
             throw new NotFoundException("Appointment " + id + " not found");
         }
-        return toDto(appt);
+        return Mappers.mapToDto(appt);
     }
 
     // -------------------------
@@ -104,7 +104,7 @@ public class AppointmentService {
                         "join fetch a.procedure " +
                         "join fetch a.doctor " +
                         "order by a.startAt asc"
-        ).list().stream().map(this::toDto).toList();
+        ).list().stream().map(Mappers::mapToDto).toList();
     }
 
     // -------------------------
@@ -116,9 +116,9 @@ public class AppointmentService {
         LOG.info("DTO:" + dto.toString());
         LOG.info("DTO:" + dto.toString());
 
-        Appointment appt = appointmentRepo.findById(id);
+        Appointment appointment = appointmentRepo.findById(id);
         LOG.info("DTO:" + dto.toString());
-        if (appt == null) throw new NotFoundException("Appointment " + id + " not found");
+        if (appointment == null) throw new NotFoundException("Appointment " + id + " not found");
 
 
 
@@ -127,18 +127,18 @@ public class AppointmentService {
         Procedure procedure = procedureRepo.findById(dto.getProcedureId());
         if (procedure == null) throw new NotFoundException("Procedure " + dto.getProcedureId() + " not found");
 
-        OffsetDateTime startAt = parseBucharest(dto.getStartAt());
-        OffsetDateTime endAt   = parseBucharest(dto.getEndAt());
-        appt.setDoctor(doctor);
-        appt.setProcedure(procedure);
-        appt.setPatientName(dto.getPatientName());
-        appt.setStartAt(startAt);
-        appt.setEndTime(endAt);
-        appt.setState(dto.getState());
-        LOG.info("Entity: " + appt.toString());
+        OffsetDateTime startAt = ClinicUtil.parseBucharest(dto.getStartAt());
+        OffsetDateTime endAt   = ClinicUtil.parseBucharest(dto.getEndAt());
+        appointment.setDoctor(doctor);
+        appointment.setProcedure(procedure);
+        appointment.setPatientName(dto.getPatientName());
+        appointment.setStartAt(startAt);
+        appointment.setEndTime(endAt);
+        appointment.setState(dto.getState());
+        LOG.info("Entity: " + appointment.toString());
         appointmentRepo.flush(); // optional
 
-        return toDto(appt);
+        return Mappers.mapToDto(appointment);
     }
     @Transactional
     public boolean delete(Long id) {
@@ -149,35 +149,13 @@ public class AppointmentService {
         return true;
     }
 
-    private AppointmentDto toDto(Appointment a) {
-        return AppointmentDto.builder()
-                .id(a.getId() == null ? null : a.getId())
-                .doctorId(a.getDoctor() != null ? a.getDoctor().getId() : null)
-                .procedureId(a.getProcedure() != null ? a.getProcedure().getId() : null)
-                .patientName(a.getPatientName())
-                .startAt(formatBucharest(a.getStartAt()))
-                .state(a.getState())
-                .endAt(a.getEndTime() == null ? null : formatBucharest(a.getEndTime()))
-                .build();
-    }
 
     // -------------------------
     // Date-time helpers
     // -------------------------
-    private static OffsetDateTime parseBucharest(String s) {
-        if (isBlank(s)) throw new BadRequestException("startAt must be provided");
-        LocalDateTime ldt = LocalDateTime.parse(s.trim(), IO_FMT);
-        return ldt.atZone(BUCURESTI).toOffsetDateTime();
-    }
 
-    private static String formatBucharest(OffsetDateTime odt) {
-        if (odt == null) return null;
-        return odt.atZoneSameInstant(BUCURESTI).toLocalDateTime().format(IO_FMT);
-    }
 
-    private static boolean isBlank(String s) {
-        return s == null || s.trim().isEmpty();
-    }
+
 
     @Transactional
     public AppointmentDto updateState(Long id, AppointmentDto dto) {
@@ -199,7 +177,7 @@ public class AppointmentService {
         }
         appt.setState(next);
 
-        return toDto(appt);
+        return Mappers.mapToDto(appt);
     }
 
     private boolean isAllowedTransition(AppointmentState current, AppointmentState next) {

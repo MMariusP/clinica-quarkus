@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class UserDto {
-    private Integer id;
+    private Long id;
 
     @NotBlank
     @Size(max = 255)
@@ -24,4 +24,14 @@ public class UserDto {
     @Email
     @Size(max = 50)
     private String email;
+
+    @Override
+    public String toString() {
+        return "UserDto{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }

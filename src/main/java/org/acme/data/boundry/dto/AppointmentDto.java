@@ -14,9 +14,11 @@ public class AppointmentDto {
 
     @NotNull
     private Long doctorId;
+    private UserDto doctor;
 
     @NotNull
     private Long procedureId;
+    private ProcedureDto procedure;
 
     @NotBlank
     @Size(max = 255)

@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ProcedureDto {
-    private Integer id;
+    private Long id;
 
     @NotBlank
     @Size(max = 255)

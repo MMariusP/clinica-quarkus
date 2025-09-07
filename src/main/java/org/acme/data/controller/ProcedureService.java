@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.acme.data.Procedure;
+import org.acme.data.boundry.dto.Mappers;
 import org.acme.data.boundry.dto.ProcedureDto;
 import org.acme.data.repoistory.ProcedureRepository;
 
@@ -17,18 +18,18 @@ public class ProcedureService {
     ProcedureRepository repo;
 
     public List<ProcedureDto> listAll() {
-        return repo.listAll().stream().map(this::mapToDto).collect(Collectors.toList());
+        return repo.listAll().stream().map(Mappers::mapToDto).collect(Collectors.toList());
     }
 
     public ProcedureDto findById(Long id) {
-        return mapToDto(repo.findById(id));
+        return Mappers.mapToDto(repo.findById(id));
     }
 
     @Transactional
     public ProcedureDto create(ProcedureDto procedureDto) {
         Procedure p = Procedure.builder().name(procedureDto.getName()).build();
-        repo.persist(mapToModel(procedureDto));
-        return mapToDto(p);
+        repo.persist(Mappers.mapToModel(p, procedureDto));
+        return Mappers.mapToDto(p);
     }
 
     @Transactional
@@ -36,7 +37,7 @@ public class ProcedureService {
         Procedure procedure = repo.findById(id);
         if (procedure == null) return null;
         procedure.setName(procedureDto.getName());
-        return mapToDto(procedure);
+        return Mappers.mapToDto(procedure);
     }
 
     @Transactional
@@ -44,19 +45,5 @@ public class ProcedureService {
         return repo.deleteById(id);
     }
 
-    public ProcedureDto mapToDto(Procedure p) {
-        return ProcedureDto.builder()
-                .id(p.getId())
-                .name(p.getName())
-                .description(p.getDescription())
-                .build();
-    }
 
-    public Procedure mapToModel(ProcedureDto p) {
-        return Procedure.builder()
-                .id(p.getId())
-                .name(p.getName())
-                .description(p.getDescription())
-                .build();
-    }
 }
