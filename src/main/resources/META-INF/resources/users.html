@@ -26,6 +26,13 @@
                     createdAt:""
                 };
 
+                $scope.formUpdate = {
+                    username: "",
+                    password: "",
+                    email: "",
+                    createdAt:""
+                };
+
                 //load data
                 _refreshPageData();
 
@@ -49,9 +56,9 @@
 
             $scope.update = function () {
                 var data = {
-                    "username": $scope.form.username,
-                    "password": $scope.form.password,
-                    "email": $scope.form.email
+                    "username": $scope.formUpdate.username,
+                    "password": $scope.formUpdate.password,
+                    "email": $scope.formUpdate.email
                 };
 
                 $http({

@@ -10,3 +10,5 @@ CREATE TRIGGER update_created_at_trigger
 BEFORE INSERT ON clinic_users
 FOR EACH ROW
 EXECUTE PROCEDURE update_created_at_column();
+
+

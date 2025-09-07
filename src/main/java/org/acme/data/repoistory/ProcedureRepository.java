@@ -1,4 +1,9 @@
 package org.acme.data.repoistory;
 
-public class ProcedureRepository {
+import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+import org.acme.data.Procedure;
+
+@ApplicationScoped
+public class ProcedureRepository implements PanacheRepository<Procedure> {
 }

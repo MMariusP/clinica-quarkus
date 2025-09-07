@@ -10,4 +10,11 @@ public class UserRepository implements PanacheRepository<User> {
     public void deleteUserByUsername(String username) {
         delete("username", username);
     }
+
+    public User findByUsername(String username) {
+        return find("username", username).firstResult();
+    }
+
 }
+
+

@@ -1,3 +1,0 @@
-CREATE TABLE IF EXISTS TEST(
-    id INTEGER primary key
-)
