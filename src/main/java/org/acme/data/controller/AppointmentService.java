@@ -149,14 +149,6 @@ public class AppointmentService {
         return true;
     }
 
-
-    // -------------------------
-    // Date-time helpers
-    // -------------------------
-
-
-
-
     @Transactional
     public AppointmentDto updateState(Long id, AppointmentDto dto) {
         Appointment appt = appointmentRepo.findById(id);

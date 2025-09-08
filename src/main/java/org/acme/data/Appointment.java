@@ -49,6 +49,7 @@ public class Appointment {
                 ", patientName='" + patientName + '\'' +
                 ", startAt=" + startAt +
                 ", endTime=" + endTime +
+                ", state=" + state +
                 '}';
     }
 }
