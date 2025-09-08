@@ -2,6 +2,7 @@ package org.acme.data.boundry;
 
 
 import io.quarkus.logging.Log;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -17,6 +18,7 @@ import org.acme.data.repoistory.UserRepository;
 import org.jboss.logging.Logger;
 
 @Path("/users")
+@RolesAllowed({"ADMIN", "doctor"})
 public class UserResource {
 
     @Inject
