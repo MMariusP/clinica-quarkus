@@ -1,15 +1,16 @@
 package org.acme.data.controller;
 
+import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
 import org.acme.data.User;
 import org.acme.data.boundry.dto.Mappers;
 import org.acme.data.boundry.dto.UserDto;
 import org.acme.data.repoistory.AppointmentRepository;
 import org.acme.data.repoistory.UserRepository;
-import org.acme.data.util.ClinicUtil;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -29,15 +30,15 @@ public class UserService {
     AppointmentRepository appointmentRepository;
 
     public Set<UserDto> getAllUsers() {
-        return userRepository.listAll().stream().map(Mappers::mapToDto).collect(Collectors.toSet());
+        return userRepository.listAll().stream().map(Mappers::mapUserToDto).collect(Collectors.toSet());
     }
 
     public UserDto updateUserByUsername(UserDto userDto, String username) {
         User existtingUser = userRepository.findById(userDto.getId());
         if (existtingUser == null) return null;
-        Mappers.mapToModel(existtingUser, userDto);
+        Mappers.mapUserToModel(existtingUser, userDto);
         userRepository.persist(existtingUser);
-        return Mappers.mapToDto(existtingUser);
+        return Mappers.mapUserToDto(existtingUser);
     }
 
     public void deleteUserbyUsername(String username) {
@@ -54,9 +55,17 @@ public class UserService {
         Set<Long> busy = appointmentRepository.findBusyDoctorIds(start, end, excludeId);
         if (busy.isEmpty()) {
             // For now: all users are doctors
-            return userRepository.listAll().stream().map(Mappers::mapToDto).collect(Collectors.toList());
+            return userRepository.listAll().stream().map(Mappers::mapUserToDto).collect(Collectors.toList());
         }
-        return userRepository.list("id not in ?1", busy).stream().map(Mappers::mapToDto).collect(Collectors.toList());
+        return userRepository.list("id not in ?1", busy).stream().map(Mappers::mapUserToDto).collect(Collectors.toList());
     }
+    public User getCurrentUser(SecurityIdentity identity) {
+        String principal = identity.getPrincipal().getName();
 
+        User user = userRepository.find("username", principal).firstResult();
+        if (user == null) {
+            throw new NotFoundException("User not found for principal: " + principal);
+        }
+        return user;
+    }
 }

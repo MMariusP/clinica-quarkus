@@ -18,18 +18,18 @@ public class ProcedureService {
     ProcedureRepository repo;
 
     public List<ProcedureDto> listAll() {
-        return repo.listAll().stream().map(Mappers::mapToDto).collect(Collectors.toList());
+        return repo.listAll().stream().map(Mappers::mapProcedureToDto).collect(Collectors.toList());
     }
 
     public ProcedureDto findById(Long id) {
-        return Mappers.mapToDto(repo.findById(id));
+        return Mappers.mapProcedureToDto(repo.findById(id));
     }
 
     @Transactional
     public ProcedureDto create(ProcedureDto procedureDto) {
         Procedure p = Procedure.builder().name(procedureDto.getName()).build();
-        repo.persist(Mappers.mapToModel(p, procedureDto));
-        return Mappers.mapToDto(p);
+        repo.persist(Mappers.mapProcedureToModel(p, procedureDto));
+        return Mappers.mapProcedureToDto(p);
     }
 
     @Transactional
@@ -37,7 +37,7 @@ public class ProcedureService {
         Procedure procedure = repo.findById(id);
         if (procedure == null) return null;
         procedure.setName(procedureDto.getName());
-        return Mappers.mapToDto(procedure);
+        return Mappers.mapProcedureToDto(procedure);
     }
 
     @Transactional

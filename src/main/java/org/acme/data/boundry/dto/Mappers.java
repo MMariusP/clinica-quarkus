@@ -1,7 +1,6 @@
 package org.acme.data.boundry.dto;
 
 import org.acme.data.Appointment;
-import org.acme.data.AppointmentState;
 import org.acme.data.Procedure;
 import org.acme.data.User;
 import org.acme.data.util.ClinicUtil;
@@ -9,7 +8,7 @@ import org.acme.data.util.ClinicUtil;
 import java.time.OffsetDateTime;
 
 public class Mappers {
-    public static ProcedureDto mapToDto(Procedure p) {
+    public static ProcedureDto mapProcedureToDto(Procedure p) {
         return ProcedureDto.builder()
                 .id(p.getId())
                 .name(p.getName())
@@ -17,14 +16,14 @@ public class Mappers {
                 .build();
     }
 
-    public static Procedure mapToModel(Procedure procedure, ProcedureDto procedureDto) {
+    public static Procedure mapProcedureToModel(Procedure procedure, ProcedureDto procedureDto) {
         if(procedure == null || procedureDto == null) { return procedure; }
         procedure.setName(procedureDto.getName());
         procedure.setDescription(procedureDto.getDescription());
         return procedure;
     }
 
-    public static UserDto mapToDto(User u) {
+    public static UserDto mapUserToDto(User u) {
         return UserDto.builder()
                 .id(u.getId())
                 .username(u.getUsername())
@@ -33,7 +32,7 @@ public class Mappers {
                 .build();
     }
 
-    public static User mapToModel(User existing, UserDto dto) {
+    public static User mapUserToModel(User existing, UserDto dto) {
         if (existing == null || dto == null) return existing;
 
         existing.setUsername(dto.getUsername());
@@ -42,7 +41,7 @@ public class Mappers {
         return existing;
     }
 
-    public static AppointmentDto mapToDto(Appointment a) {
+    public static AppointmentDto mapAppointmentToDto(Appointment a) {
         return AppointmentDto.builder()
                 .id(a.getId() == null ? null : a.getId())
                 .doctorId(a.getDoctor() != null ? a.getDoctor().getId() : null)
@@ -51,8 +50,8 @@ public class Mappers {
                 .startAt(ClinicUtil.formatBucharest(a.getStartAt()))
                 .state(a.getState())
                 .endAt(a.getEndTime() == null ? null : ClinicUtil.formatBucharest(a.getEndTime()))
-                .doctor(mapToDto(a.getDoctor()))
-                .procedure(mapToDto(a.getProcedure()))
+                .doctor(mapUserToDto(a.getDoctor()))
+                .procedure(mapProcedureToDto(a.getProcedure()))
                 .build();
 
     }

@@ -7,6 +7,7 @@ import org.acme.data.AppointmentState;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @ApplicationScoped
@@ -37,6 +38,10 @@ public class AppointmentRepository implements PanacheRepository<Appointment> {
         if (excludeAppointmentId != null) q.setParameter("excludeId", excludeAppointmentId);
 
         return new HashSet<>(q.getResultList());
+    }
+
+    public List<Appointment> findByDoctorId(Long doctorId) {
+        return list("doctor.id", doctorId);
     }
 
 }

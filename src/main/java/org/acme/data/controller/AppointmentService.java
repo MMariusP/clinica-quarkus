@@ -1,5 +1,6 @@
 package org.acme.data.controller;
 
+import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -20,10 +21,10 @@ import org.acme.data.repoistory.ProcedureRepository;
 import org.acme.data.repoistory.UserRepository;
 
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.acme.data.util.ClinicUtil;
 import org.jboss.logging.Logger;
@@ -38,6 +39,8 @@ public class AppointmentService {
     @Inject
     UserRepository userRepo;
 
+    @Inject
+    UserService userService;
     private static final Logger LOG = Logger.getLogger(AppointmentService.class);
 
 
@@ -73,7 +76,7 @@ public class AppointmentService {
 
         appointmentRepo.persist(entity); // no explicit EntityManager
 
-        return Mappers.mapToDto(entity);
+        return Mappers.mapAppointmentToDto(entity);
     }
 
     // -------------------------
@@ -91,7 +94,7 @@ public class AppointmentService {
         if (appt == null) {
             throw new NotFoundException("Appointment " + id + " not found");
         }
-        return Mappers.mapToDto(appt);
+        return Mappers.mapAppointmentToDto(appt);
     }
 
     // -------------------------
@@ -104,7 +107,7 @@ public class AppointmentService {
                         "join fetch a.procedure " +
                         "join fetch a.doctor " +
                         "order by a.startAt asc"
-        ).list().stream().map(Mappers::mapToDto).toList();
+        ).list().stream().map(Mappers::mapAppointmentToDto).toList();
     }
 
     // -------------------------
@@ -138,7 +141,7 @@ public class AppointmentService {
         LOG.info("Entity: " + appointment.toString());
         appointmentRepo.flush(); // optional
 
-        return Mappers.mapToDto(appointment);
+        return Mappers.mapAppointmentToDto(appointment);
     }
     @Transactional
     public boolean delete(Long id) {
@@ -169,7 +172,7 @@ public class AppointmentService {
         }
         appt.setState(next);
 
-        return Mappers.mapToDto(appt);
+        return Mappers.mapAppointmentToDto(appt);
     }
 
     private boolean isAllowedTransition(AppointmentState current, AppointmentState next) {
@@ -180,5 +183,32 @@ public class AppointmentService {
             case IN_PROGRESS  -> next == AppointmentState.DONE;
             case DONE, CANCELED -> false;
         };
+    }
+
+    public List<AppointmentDto> listForCurrentIdentity(SecurityIdentity identity) {
+        if (isAdmin(identity)) {
+            return appointmentRepo.listAll()
+                    .stream().map(Mappers::mapAppointmentToDto)
+                    .collect(Collectors.toList());
+        }
+
+        // Doctor path: scope by the authenticated user's doctor id.
+        User me = userService.getCurrentUser(identity);
+        if (me == null || me.getId() == null) {
+            throw new NotFoundException("Authenticated user not found or missing id");
+        }
+
+        return appointmentRepo.findByDoctorId(me.getId())
+                .stream()
+                .map(Mappers::mapAppointmentToDto)
+                .collect(Collectors.toList());
+    }
+
+    private boolean isAdmin(SecurityIdentity identity) {
+        Set<String> roles = identity.getRoles();
+        // Be tolerant to different role notations and casing
+        return roles.stream()
+                .map(String::toUpperCase)
+                .anyMatch(r -> r.equals("ADMIN") || r.equals("ROLE_ADMIN"));
     }
 }

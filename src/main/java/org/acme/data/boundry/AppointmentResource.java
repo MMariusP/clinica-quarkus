@@ -1,5 +1,6 @@
 package org.acme.data.boundry;
 
+import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -19,9 +20,12 @@ public class AppointmentResource {
     @Inject
     AppointmentService appointmentService;
 
+    @Inject
+    SecurityIdentity identity;
+
     @GET
     public List<AppointmentDto> list() {
-        return appointmentService.listAll();
+        return appointmentService.listForCurrentIdentity(identity);
     }
     private Logger logger;
     @GET
