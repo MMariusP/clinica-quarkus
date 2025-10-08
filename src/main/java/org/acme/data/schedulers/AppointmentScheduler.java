@@ -31,7 +31,7 @@ public class AppointmentScheduler {
     /**
      * Runs every 60 seconds; skips overlapping execution.
      */
-    @Scheduled(every = "30s", concurrentExecution = ConcurrentExecution.SKIP)
+    @Scheduled(every = "20m", concurrentExecution = ConcurrentExecution.SKIP)
     @Transactional
     void processAppointments() {
         LOG.info("Processing appointments");

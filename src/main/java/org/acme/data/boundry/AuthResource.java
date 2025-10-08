@@ -31,7 +31,6 @@ public class AuthResource {
     @Transactional
     public Response login(LoginRequest req) {
         LOG.info("Performing authentication.");
-
         LOG.info(req.username);
         var user = userRepository.find("username = ?1", req.username())
                 .firstResultOptional().orElse(null);
@@ -50,6 +49,7 @@ public class AuthResource {
                 .expiresAt(exp)
                 .sign();
         LOG.info("token: " + token);
+
 
         return Response.ok(new TokenResponse(token, exp.getEpochSecond())).build();
     }

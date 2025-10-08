@@ -23,21 +23,21 @@ public class NotificationResource {
     void init() { broadcaster = sse.newBroadcaster(); }
 
     @GET
-    @Path("/stream")
+    @Path("/stream/{token}")
     @Produces(MediaType.SERVER_SENT_EVENTS)
     @SseElementType(MediaType.APPLICATION_JSON)
     @Authenticated
-    public void stream(@Context SseEventSink sink) {
+    public void stream(@Context SseEventSink sink, @PathParam("token") String token) {
         broadcaster.register(sink);
     }
 
     public void emitAppointmentStarted(AppointmentStartedNotification payload) {
         OutboundSseEvent event = sse.newEventBuilder()
-                .name("appointment-started")
-                .mediaType(MediaType.APPLICATION_JSON_TYPE)
-                .data(AppointmentStartedNotification.class, payload)
-                .build();
-        broadcaster.broadcast(event);
+                    .name("appointment-started")
+                    .mediaType(MediaType.APPLICATION_JSON_TYPE)
+                    .data(AppointmentStartedNotification.class, payload)
+                    .build();
+            broadcaster.broadcast(event);
     }
 
     public record AppointmentStartedNotification(
