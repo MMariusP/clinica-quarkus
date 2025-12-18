@@ -20,9 +20,7 @@ import org.acme.data.repoistory.ProcedureRepository;
 import org.acme.data.repoistory.UserRepository;
 
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import org.acme.data.util.ClinicUtil;
@@ -76,9 +74,6 @@ public class AppointmentService {
         return Mappers.mapToDto(entity);
     }
 
-    // -------------------------
-    // Read (by id)
-    // -------------------------
     @Transactional(value = TxType.SUPPORTS)
     public AppointmentDto findById(Long id) {
         Appointment appt = appointmentRepo.find(
@@ -94,9 +89,6 @@ public class AppointmentService {
         return Mappers.mapToDto(appt);
     }
 
-    // -------------------------
-    // List all (sorted by startAt)
-    // -------------------------
     @Transactional(value = TxType.SUPPORTS)
     public List<AppointmentDto> listAll() {
         return appointmentRepo.find(
@@ -107,9 +99,6 @@ public class AppointmentService {
         ).list().stream().map(Mappers::mapToDto).toList();
     }
 
-    // -------------------------
-    // Update (full replace of editable fields)
-    // -------------------------
     @Transactional
     public AppointmentDto update(Long id, @Valid AppointmentDto dto) {
         LOG.info("DTO:" + dto.toString());
@@ -140,6 +129,7 @@ public class AppointmentService {
 
         return Mappers.mapToDto(appointment);
     }
+
     @Transactional
     public boolean delete(Long id) {
         boolean deleted = appointmentRepo.deleteById(id);
@@ -156,7 +146,6 @@ public class AppointmentService {
             throw new NotFoundException("Appointment not found: " + id);
         }
 
-        // CANCELED is terminal
         if (appt.getState() == AppointmentState.CANCELED) {
             throw new BadRequestException("Canceled appointments cannot change state");
         }
@@ -164,6 +153,7 @@ public class AppointmentService {
         if (next == null) {
             throw new BadRequestException("state is required");
         }
+
         if (!isAllowedTransition(appt.getState(), next)) {
             throw new BadRequestException("Invalid transition: " + appt.getState() + " -> " + next);
         }

@@ -9,7 +9,6 @@ import org.acme.data.boundry.dto.Mappers;
 import org.acme.data.boundry.dto.UserDto;
 import org.acme.data.repoistory.AppointmentRepository;
 import org.acme.data.repoistory.UserRepository;
-import org.acme.data.util.ClinicUtil;
 
 import java.time.OffsetDateTime;
 import java.util.List;

@@ -1,8 +1,6 @@
 package org.acme.data.boundry;
 
 import io.quarkus.security.Authenticated;
-import io.smallrye.jwt.auth.principal.JWTParser;
-import io.smallrye.jwt.auth.principal.ParseException;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -27,7 +25,7 @@ public class NotificationResource {
     @Produces(MediaType.SERVER_SENT_EVENTS)
     @SseElementType(MediaType.APPLICATION_JSON)
     @Authenticated
-    public void stream(@Context SseEventSink sink, @PathParam("token") String token) {
+    public void stream(@Context SseEventSink  sink, @PathParam("token") String token) {
         broadcaster.register(sink);
     }
 
